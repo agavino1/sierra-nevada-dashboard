@@ -33,22 +33,43 @@ function calculateScore(property) {
   const bathrooms = property.bathrooms || 0;
   const sizeM2 = property.size_m2 || 0;
   
-  // Price scoring: lower is better for value (5-10)
-  if (price < 150000) score += 2;
-  else if (price < 250000) score += 1.5;
-  else if (price < 400000) score += 1;
-  else if (price < 600000) score += 0.5;
+  // PRECIO: Factor más importante - relación precio/m2
+  // Ideal: < 2500€/m2 en Sierra Nevada
+  if (sizeM2 > 0) {
+    const pricePerM2 = price / sizeM2;
+    if (pricePerM2 < 2000) score += 2.5;
+    else if (pricePerM2 < 2500) score += 2;
+    else if (pricePerM2 < 3000) score += 1.5;
+    else if (pricePerM2 < 3500) score += 1;
+    else score += 0.5;
+  } else {
+    // Si no tenemos m2, usar precio absoluto
+    if (price < 150000) score += 2.5;
+    else if (price < 250000) score += 2;
+    else if (price < 350000) score += 1.5;
+    else if (price < 500000) score += 1;
+    else if (price < 700000) score += 0.5;
+  }
   
-  // Bedrooms: 3 is ideal
-  if (bedrooms === 3) score += 1;
-  else if (bedrooms >= 2 && bedrooms <= 4) score += 0.5;
+  // DORMITORIOS: 3 es ideal para familias en zona de montaña
+  if (bedrooms === 3) score += 1.5;
+  else if (bedrooms === 4) score += 1.2;
+  else if (bedrooms === 2) score += 0.8;
+  else if (bedrooms >= 5) score += 1;
   
-  // Size: bigger is better (for given price)
+  // BAÑOS: Importante para comodidad
+  if (bathrooms >= 3) score += 1;
+  else if (bathrooms === 2) score += 0.5;
+  
+  // TAMAÑO: m2 útil - en zonas de montaña > 100m2 es muy bueno
   if (sizeM2 > 150) score += 1;
+  else if (sizeM2 > 120) score += 0.8;
   else if (sizeM2 > 100) score += 0.5;
   
-  // Bathrooms: more is better
-  if (bathrooms >= 3) score += 0.5;
+  // BONUS: Propiedades bien equilibradas
+  if (bedrooms >= 2 && bathrooms >= 2 && sizeM2 > 80) {
+    score += 0.5; // Bonus por ser una propiedad bien equilibrada
+  }
   
   return Math.min(10, Math.max(1, Math.round(score * 10) / 10));
 }
