@@ -13,7 +13,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 // Load properties data
-const dataPath = '/home/alvaro/.openclaw/workspace/sierra-nevada-monitor/data/properties.json';
+const dataPath = path.join(__dirname, 'data', 'properties.json');
 let propertiesData = {};
 
 try {
